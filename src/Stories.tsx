@@ -65,7 +65,7 @@ function renderItem(item: Item) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingVertical: 30,
+    paddingTop: 30,
     paddingHorizontal: 10,
   } as ViewStyle,
   list: {
