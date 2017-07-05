@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "allowJs": false,
+    "checkJs": false,
+    "module": "es2015",
+    "target": "es2015",
+    "jsx": "react-native",
+    "moduleResolution": "node",
+    "rootDir": "src",
+    "outDir": "dist",
+    "inlineSourceMap": true,
+    /*"sourceRoot": "src",
+    "sourceMap": true,
+    "inlineSources": true,*/
+    "alwaysStrict": true,
+    "noImplicitAny": false,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "types": [],
+    "baseUrl": ".",
+    "paths": {
+      "*": [
+        "@types/*"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx"
+  ]
+}

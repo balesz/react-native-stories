@@ -1,0 +1,15 @@
+{
+  "name": "react-native-stories",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "index.d.ts",
+  "license": "MIT",
+  "dependencies": {
+    "lodash": "^4.17.4",
+    "react-navigation": "^1.0.0-beta.11"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*"
+  }
+}
