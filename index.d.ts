@@ -1,19 +1,19 @@
 /// <reference types="react" />
 
 export interface StoryDelegate {
-    (): JSX.Element;
+    (): JSX.Element
 }
 
 export interface DecoratorDelegate {
-    (story: () => JSX.Element): JSX.Element;
+    (story: () => JSX.Element): JSX.Element
 }
 
 export interface IStoryBuilder {
-    add(name: string, story: StoryDelegate): any;
-    addDecorator(decor: DecoratorDelegate): any;
+    add(name: string, story: StoryDelegate): IStoryBuilder
+    addDecorator(decor: DecoratorDelegate): IStoryBuilder
 }
 
-export declare function storiesOf(kind: string, module: any): IStoryBuilder;
+export declare function storiesOf(kind: string, module: any): IStoryBuilder
 
 export declare function action(name: string)
 
