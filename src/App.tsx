@@ -12,7 +12,8 @@ export const StoriesApp: React.StatelessComponent<any> = props => {
 }
 
 export function linkTo(kind: string, name: string) {
-  navigatorRef._navigation.navigate(getScreenKey(kind, name))
+  if (kind === "go" && name === "back") navigatorRef._navigation.goBack()
+  else navigatorRef._navigation.navigate(getScreenKey(kind, name))
 }
 
 export function action(name: string) {
