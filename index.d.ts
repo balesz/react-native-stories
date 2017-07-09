@@ -1,5 +1,7 @@
 /// <reference types="react" />
 
+declare const module: any
+
 export interface StoryDelegate {
     (): JSX.Element
 }
