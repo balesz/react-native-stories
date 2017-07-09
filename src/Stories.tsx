@@ -1,27 +1,127 @@
 import _ from "lodash"
 import React from "react"
 import {
+  AsyncStorage,
+  LayoutAnimation,
+  LayoutAnimationConfig,
   SectionList,
   SectionListData,
   StyleSheet,
-  View,
-  ViewStyle,
   Text,
   TextStyle,
-  TouchableOpacity
+  TouchableOpacity,
+  UIManager,
+  View,
+  ViewStyle,
 } from "react-native"
-import {StoryBuilder} from "."
-import {linkTo} from "./App"
+import { StoryBuilder } from "."
+import { linkTo } from "./App"
 
-export const Stories: React.StatelessComponent<any> = props => {
-  return <View style={styles.container}>
-    <SectionList
-      style={styles.list}
-      contentContainerStyle={styles.listContainer}
-      sections={getSections()}
-      renderSectionHeader={({section}) => renderSectionHeader(section as Section)}
-      renderItem={({item}) => renderItem(item)}/>
-  </View>
+interface State {
+  selectedKind: string
+}
+
+if (UIManager.setLayoutAnimationEnabledExperimental)
+  UIManager.setLayoutAnimationEnabledExperimental(true)
+
+export class Stories extends React.Component<any, State> {
+
+  private sections: Section[]
+
+  constructor(props) {
+    super(props)
+    this.sections = getSections()
+    this.state = { selectedKind: null }
+  }
+
+  componentWillMount() {
+    AsyncStorage.getItem("selectedKind").then(kind => {
+      if (kind && kind != this.state.selectedKind)
+        this.setState({ selectedKind: kind })
+    })
+    AsyncStorage.getItem("selectedStory").then(story => {
+      if (story)
+        linkTo(story, "")
+    })
+  }
+
+  private onClickSection(section: string) {
+    LayoutAnimation.easeInEaseOut(null as LayoutAnimationConfig)
+    AsyncStorage.setItem("selectedKind", section)
+    AsyncStorage.removeItem("selectedStory")
+    this.setState({ selectedKind: section })
+  }
+
+  private renderSectionHeader(section: Section) {
+    return <TouchableOpacity
+      onPress={() => this.onClickSection(section.key)}
+      style={this.styles.sectionContainer}>
+      <Text style={this.styles.sectionText}>{section.key}</Text>
+      <View style={this.styles.sectionSeparator} />
+    </TouchableOpacity>
+  }
+
+  private renderItem(item: Item) {
+    if (this.state.selectedKind != item.kind) return null
+    else return <TouchableOpacity
+      style={this.styles.itemContainer}
+      onPress={() => {
+        AsyncStorage.setItem("selectedStory", item.key)
+        linkTo(item.kind, item.name)
+      }}>
+      <Text style={this.styles.itemText}>{item.name}</Text>
+    </TouchableOpacity>
+  }
+
+  render() {
+    const { selectedKind } = this.state
+    return <View style={this.styles.container}>
+      <SectionList
+        style={this.styles.list}
+        stickySectionHeadersEnabled={false}
+        contentContainerStyle={this.styles.listContainer}
+        sections={this.sections}
+        renderItem={({ item }) => this.renderItem(item)}
+        renderSectionHeader={({ section }) => this.renderSectionHeader(section)} />
+    </View>
+  }
+
+  private get styles() {
+    return StyleSheet.create({
+      container: {
+        flex: 1,
+        paddingTop: 30,
+        paddingHorizontal: 10,
+        backgroundColor: "white",
+      } as ViewStyle,
+      list: {
+        flex: 1,
+      } as ViewStyle,
+      listContainer: {
+      } as ViewStyle,
+      sectionSeparator: {
+        height: 0.5,
+        marginVertical: 4,
+        backgroundColor: "gray",
+      } as ViewStyle,
+      sectionContainer: {
+        marginVertical: 5,
+      } as ViewStyle,
+      sectionText: {
+        fontSize: 18,
+        fontWeight: "bold",
+      } as TextStyle,
+      itemContainer: {
+        justifyContent: "center",
+        paddingVertical: 10,
+        paddingLeft: 20,
+        paddingRight: 10,
+      } as ViewStyle,
+      itemText: {
+        fontSize: 14,
+      } as TextStyle,
+    })
+  }
 }
 
 interface Item {
@@ -36,55 +136,13 @@ function getSections(): Section[] {
   const result: Section[] = []
   StoryBuilder.stories.forEach(it => {
     const items = it.stories.map(story => ({
-      key: it.kind+story.name,
+      key: it.kind + story.name,
       kind: it.kind,
       name: story.name,
     }))
     const section = result.find(el => el.key == it.kind)
     if (section) section.data.push(...items)
-    else result.push({key: it.kind, data: items})
+    else result.push({ key: it.kind, data: items })
   })
   return result
 }
-
-function renderSectionHeader(section: Section) {
-  return <View style={styles.sectionContainer}>
-    <Text style={styles.sectionText}>{section.key}</Text>
-  </View>
-}
-
-function renderItem(item: Item) {
-  return <TouchableOpacity
-    style={styles.itemContainer}
-    onPress={() => linkTo(item.kind, item.name)}>
-    <Text style={styles.itemText}>{item.name}</Text>
-  </TouchableOpacity>
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 30,
-    paddingHorizontal: 10,
-  } as ViewStyle,
-  list: {
-    flex: 1,
-  } as ViewStyle,
-  listContainer: {
-  } as ViewStyle,
-  sectionContainer: {
-  } as ViewStyle,
-  sectionText: {
-    fontSize: 20,
-    fontWeight: "bold",
-  } as TextStyle,
-  itemContainer: {
-    justifyContent: "center",
-    paddingVertical: 10,
-    paddingLeft: 20,
-    paddingRight: 10,
-  } as ViewStyle,
-  itemText: {
-    fontSize: 16,
-  } as TextStyle,
-})
