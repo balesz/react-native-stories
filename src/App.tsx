@@ -13,7 +13,7 @@ export const StoriesApp: React.StatelessComponent<any> = props => {
 
 export function linkTo(kind: string, name: string) {
   if (kind === "go" && name === "back") navigatorRef._navigation.goBack()
-  else navigatorRef._navigation.navigate(getScreenKey(kind, name))
+  else navigatorRef._navigation.navigate(kind+name)
 }
 
 export function action(name: string) {
@@ -24,7 +24,7 @@ function routeConfig() {
   return StoryBuilder.stories.reduce((prev, val, idx) => {
     const stories = {}
     val.stories.forEach(it => {
-      stories[getScreenKey(val.kind, it.name)] = {
+      stories[val.kind+it.name] = {
         screen: val.decorator ? () => val.decorator(it.story) : it.story
       }
     })
@@ -37,8 +37,4 @@ function navigatorConfig() {
     initialRouteName: "Root",
     headerMode: "none",
   }
-}
-
-export function getScreenKey(kind: string, name: string) {
-  return `${_.snakeCase(kind + " " + name)}`
 }

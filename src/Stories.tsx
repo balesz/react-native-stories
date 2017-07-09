@@ -11,7 +11,7 @@ import {
   TouchableOpacity
 } from "react-native"
 import {StoryBuilder} from "."
-import {getScreenKey, linkTo} from "./App"
+import {linkTo} from "./App"
 
 export const Stories: React.StatelessComponent<any> = props => {
   return <View style={styles.container}>
@@ -24,33 +24,32 @@ export const Stories: React.StatelessComponent<any> = props => {
   </View>
 }
 
-interface Section {
-  key: string
-  title: string
-  data: Item[]
-}
-
 interface Item {
   key: string
   kind: string
   name: string
 }
 
-function getSections(): SectionListData<Item>[] {
-  return StoryBuilder.stories.map(it => ({
-    key: _.snakeCase(it.kind),
-    title: it.kind,
-    data: it.stories.map(story => ({
-      key: getScreenKey(it.kind, story.name),
+type Section = SectionListData<Item>
+
+function getSections(): Section[] {
+  const result: Section[] = []
+  StoryBuilder.stories.forEach(it => {
+    const items = it.stories.map(story => ({
+      key: it.kind+story.name,
       kind: it.kind,
       name: story.name,
     }))
-  }))
+    const section = result.find(el => el.key == it.kind)
+    if (section) section.data.push(...items)
+    else result.push({key: it.kind, data: items})
+  })
+  return result
 }
 
 function renderSectionHeader(section: Section) {
   return <View style={styles.sectionContainer}>
-    <Text style={styles.sectionText}>{section.title}</Text>
+    <Text style={styles.sectionText}>{section.key}</Text>
   </View>
 }
 
