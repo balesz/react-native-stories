@@ -2,6 +2,8 @@
 
 declare const module: any
 
+type StoryMode = "drawer" | "stack"
+
 export interface StoryDelegate {
     (): JSX.Element
 }
@@ -14,6 +16,8 @@ export interface IStoryBuilder {
     add(name: string, story: StoryDelegate): IStoryBuilder
     addDecorator(decor: DecoratorDelegate): IStoryBuilder
 }
+
+export declare function initStoryMode(mode: StoryMode)
 
 export declare function storiesOf(kind: string, module: any): IStoryBuilder
 

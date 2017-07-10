@@ -1,7 +1,6 @@
 import _ from "lodash"
 import React from "react"
 import {
-  AsyncStorage,
   LayoutAnimation,
   LayoutAnimationConfig,
   SectionList,
@@ -15,7 +14,6 @@ import {
   ViewStyle,
 } from "react-native"
 import { StoryBuilder } from "."
-import { linkTo } from "./App"
 
 interface State {
   selectedKind: string
@@ -34,21 +32,12 @@ export class Stories extends React.Component<any, State> {
     this.state = { selectedKind: null }
   }
 
-  componentWillMount() {
-    AsyncStorage.getItem("selectedKind").then(kind => {
-      if (kind && kind != this.state.selectedKind)
-        this.setState({ selectedKind: kind })
-    })
-    AsyncStorage.getItem("selectedStory").then(story => {
-      if (story)
-        linkTo(story, "")
-    })
+  private navigate(screen: string) {
+    this.props.navigation.navigate(screen)
   }
 
   private onClickSection(section: string) {
     LayoutAnimation.easeInEaseOut(null as LayoutAnimationConfig)
-    AsyncStorage.setItem("selectedKind", section)
-    AsyncStorage.removeItem("selectedStory")
     this.setState({ selectedKind: section })
   }
 
@@ -64,10 +53,7 @@ export class Stories extends React.Component<any, State> {
     if (this.state.selectedKind != item.kind) return null
     else return <TouchableOpacity
       style={this.styles.itemContainer}
-      onPress={() => {
-        AsyncStorage.setItem("selectedStory", item.key)
-        linkTo(item.kind, item.name)
-      }}>
+      onPress={() => this.navigate(item.kind+item.name)}>
       <Text style={this.styles.itemText}>{item.name}</Text>
     </TouchableOpacity>
   }
@@ -85,7 +71,7 @@ export class Stories extends React.Component<any, State> {
     </View>
   }
 
-  private get styles() {
+    private get styles() {
     return StyleSheet.create({
       container: {
         flex: 1,
@@ -98,6 +84,17 @@ export class Stories extends React.Component<any, State> {
       } as ViewStyle,
       listContainer: {
       } as ViewStyle,
+      listHeader: {
+        height: 50,
+        justifyContent: "center",
+      } as ViewStyle,
+      listHeaderText: {
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        borderColor: "gray",
+        borderWidth: 1,
+        fontSize: 22,
+      } as TextStyle,
       sectionContainer: {
         paddingVertical: 10,
         borderBottomWidth: 0.5,

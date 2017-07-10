@@ -1,26 +1,39 @@
 import _ from "lodash"
 import React from "react"
-import {StackNavigator} from "react-navigation"
-import {StoryBuilder} from "."
+import {StackNavigator, DrawerNavigator} from "react-navigation"
+import {StoryBuilder, storyMode} from "."
 import {Stories} from "./Stories"
 
 let navigatorRef: any
 
-export const StoriesApp: React.StatelessComponent<any> = props => {
-  const Navigator = StackNavigator(routeConfig(), navigatorConfig())
-  return <Navigator ref={ref => navigatorRef = ref} />
+export class StoriesApp extends React.Component<any, any> {
+
+  componentDidMount() {
+    navigatorRef._navigation.navigate("DrawerOpen")
+  }
+
+  render() {
+    let Navigator = null
+    if (storyMode == "stack") {
+      Navigator = StackNavigator(routeConfig(Stories), stackNavigatorConfig())
+    } else if (storyMode == "drawer") {
+      Navigator = DrawerNavigator(routeConfig(null), drawerNavigatorConfig())
+    }
+    return <Navigator ref={ref => navigatorRef = ref} />
+  }
 }
 
 export function linkTo(kind: string, name: string) {
-  if (kind === "go" && name === "back") navigatorRef._navigation.goBack()
-  else navigatorRef._navigation.navigate(kind+name)
+  if (kind === "go" && name === "back") {
+    storyMode == "drawer" ? action(`${kind} ${name}`) : navigatorRef._navigation.goBack()
+  } else navigatorRef._navigation.navigate(kind+name)
 }
 
 export function action(name: string) {
   console.warn(name)
 }
 
-function routeConfig() {
+function routeConfig(rootComponent: any) {
   return StoryBuilder.stories.reduce((prev, val, idx) => {
     const stories = {}
     val.stories.forEach(it => {
@@ -29,12 +42,20 @@ function routeConfig() {
       }
     })
     return {...prev, ...stories}
-  }, { Root: {screen: Stories} })
+  }, rootComponent ? { Root: {screen: rootComponent} } : { })
 }
 
-function navigatorConfig() {
+function stackNavigatorConfig() {
   return {
     initialRouteName: "Root",
     headerMode: "none",
+  }
+}
+
+function drawerNavigatorConfig() {
+  return {
+    initialRoute: "Root",
+    backBehavior: "none",
+    contentComponent: props => <Stories {...props} />,
   }
 }

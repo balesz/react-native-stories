@@ -1,7 +1,13 @@
 export * from "./App"
 
 import React from "react"
-import {IStoryBuilder, DecoratorDelegate, StoryDelegate} from ".."
+import {IStoryBuilder, DecoratorDelegate, StoryDelegate, StoryMode} from ".."
+
+export let storyMode: StoryMode = "stack"
+
+export function initStoryMode(mode: StoryMode) {
+  storyMode = mode
+}
 
 export function storiesOf(kind: string, module: any): IStoryBuilder {
   return new StoryBuilder(kind)
