@@ -57,7 +57,6 @@ export class Stories extends React.Component<any, State> {
       onPress={() => this.onClickSection(section.key)}
       style={this.styles.sectionContainer}>
       <Text style={this.styles.sectionText}>{section.key}</Text>
-      <View style={this.styles.sectionSeparator} />
     </TouchableOpacity>
   }
 
@@ -99,13 +98,9 @@ export class Stories extends React.Component<any, State> {
       } as ViewStyle,
       listContainer: {
       } as ViewStyle,
-      sectionSeparator: {
-        height: 0.5,
-        marginVertical: 4,
-        backgroundColor: "gray",
-      } as ViewStyle,
       sectionContainer: {
-        marginVertical: 5,
+        paddingVertical: 10,
+        borderBottomWidth: 0.5,
       } as ViewStyle,
       sectionText: {
         fontSize: 18,
