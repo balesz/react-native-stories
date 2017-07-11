@@ -1,6 +1,7 @@
 import _ from "lodash"
 import React from "react"
 import {
+  AsyncStorage,
   LayoutAnimation,
   LayoutAnimationConfig,
   SectionList,
@@ -13,48 +14,63 @@ import {
   View,
   ViewStyle,
 } from "react-native"
+import { NavigationActions } from "react-navigation"
 import { StoryBuilder } from "."
+
+interface Props {
+  navigation: { dispatch(action: any) }
+  selected: State
+}
 
 interface State {
   selectedKind: string
+  selectedStory: string
 }
 
 if (UIManager.setLayoutAnimationEnabledExperimental)
   UIManager.setLayoutAnimationEnabledExperimental(true)
 
-export class Stories extends React.Component<any, State> {
+export class Stories extends React.Component<Props, State> {
 
-  private sections: Section[]
+  private sections: Kind[]
 
   constructor(props) {
     super(props)
     this.sections = getSections()
-    this.state = { selectedKind: null }
+    this.state = { ...props.selected }
   }
 
-  private navigate(screen: string) {
-    this.props.navigation.navigate(screen)
+  private navigate(selectedStory: string) {
+    const {selectedKind} = this.state
+    AsyncStorage.multiSet([["selectedKind", selectedKind], ["selectedStory", selectedStory]])
+    const routeName = selectedKind + selectedStory
+    this.props.navigation.dispatch(NavigationActions.reset({
+      index: 0, actions: [NavigationActions.navigate({routeName})]
+    }))
+    this.setState({selectedKind, selectedStory})
   }
 
-  private onClickSection(section: string) {
+  private onClickSection(selectedKind: string) {
     LayoutAnimation.easeInEaseOut(null as LayoutAnimationConfig)
-    this.setState({ selectedKind: section })
+    this.setState({ selectedKind })
   }
 
-  private renderSectionHeader(section: Section) {
+  private renderSectionHeader(kind: Kind) {
     return <TouchableOpacity
-      onPress={() => this.onClickSection(section.key)}
+      onPress={() => this.onClickSection(kind.key)}
       style={this.styles.sectionContainer}>
-      <Text style={this.styles.sectionText}>{section.key}</Text>
+      <Text style={this.styles.sectionText}>{kind.key}</Text>
     </TouchableOpacity>
   }
 
-  private renderItem(item: Item) {
-    if (this.state.selectedKind != item.kind) return null
+  private renderItem(story: Story) {
+    if (this.state.selectedKind != story.kind) return null
     else return <TouchableOpacity
       style={this.styles.itemContainer}
-      onPress={() => this.navigate(item.kind+item.name)}>
-      <Text style={this.styles.itemText}>{item.name}</Text>
+      onPress={() => this.navigate(story.name)}>
+      <Text style={this.state.selectedStory == story.name ? this.styles.itemTextBold : this.styles.itemText}>
+        {story.name}
+      </Text>
     </TouchableOpacity>
   }
 
@@ -71,7 +87,7 @@ export class Stories extends React.Component<any, State> {
     </View>
   }
 
-    private get styles() {
+  private get styles() {
     return StyleSheet.create({
       container: {
         flex: 1,
@@ -112,20 +128,24 @@ export class Stories extends React.Component<any, State> {
       itemText: {
         fontSize: 14,
       } as TextStyle,
+      itemTextBold: {
+        fontSize: 16,
+        fontWeight: "bold",
+      } as TextStyle
     })
   }
 }
 
-interface Item {
+interface Story {
   key: string
   kind: string
   name: string
 }
 
-type Section = SectionListData<Item>
+type Kind = SectionListData<Story>
 
-function getSections(): Section[] {
-  const result: Section[] = []
+function getSections(): Kind[] {
+  const result: Kind[] = []
   StoryBuilder.stories.forEach(it => {
     const items = it.stories.map(story => ({
       key: it.kind + story.name,
