@@ -33,9 +33,11 @@ export class StoriesApp extends React.Component<any, State> {
   render() {
     if (!this.state) return null
     const { selectedKind, selectedStory } = this.state
-    const selected = (selectedKind || "") + (selectedStory || "")
+    let selected = (selectedKind || "") + (selectedStory || "")
+    const routes = routeConfig()
+    selected = Object.keys(routes).some(it => it == selected) ? selected : null
     const stackNavConfig = stackNavigatorConfig(selected)
-    const Stack = StackNavigator(routeConfig(), stackNavConfig)
+    const Stack = StackNavigator(routes, stackNavConfig)
     const drawerNavConfig = drawerNavigatorConfig(this.state)
     const Drawer = DrawerNavigator({ Root: { screen: Stack } }, drawerNavConfig)
     return <Drawer ref={ref => navigatorRef = ref} />
