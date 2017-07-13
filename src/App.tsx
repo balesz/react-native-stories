@@ -1,4 +1,3 @@
-import _ from "lodash"
 import React from "react"
 import { AsyncStorage } from "react-native"
 import { StackNavigator, DrawerNavigator } from "react-navigation"
