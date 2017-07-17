@@ -22,11 +22,10 @@ interface State {
 
 export class StoriesApp extends React.Component<any, State> {
 
-  componentWillMount() {
-    AsyncStorage.multiGet(["selectedKind", "selectedStory"])
-      .then(([kind, story]) => this.setState({
-        selectedKind: kind[1], selectedStory: story[1]
-      }))
+  async componentWillMount() {
+    const [kind, story] = await AsyncStorage
+      .multiGet(["selectedKind", "selectedStory"])
+    this.setState({selectedKind: kind[1], selectedStory: story[1]})
   }
 
   render() {
