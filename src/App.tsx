@@ -1,10 +1,12 @@
 import React from "react"
-import { AsyncStorage } from "react-native"
+import { AsyncStorage, View } from "react-native"
 import { StackNavigator, DrawerNavigator } from "react-navigation"
+import Toast from "react-native-easy-toast"
 import { StoryBuilder } from "."
 import { Stories } from "./Stories"
 
 let navigatorRef: any
+let toastRef: Toast
 
 export function linkTo(kind: string, name: string) {
   if (kind === "go" && name === "back") navigatorRef._navigation.goBack()
@@ -12,7 +14,7 @@ export function linkTo(kind: string, name: string) {
 }
 
 export function action(name: string) {
-  console.warn(name)
+  toastRef.show(name, 2000)
 }
 
 interface State {
@@ -38,7 +40,14 @@ export class StoriesApp extends React.Component<any, State> {
     const Stack = StackNavigator(routes, stackNavConfig)
     const drawerNavConfig = drawerNavigatorConfig(this.state)
     const Drawer = DrawerNavigator({ Root: { screen: Stack } }, drawerNavConfig)
-    return <Drawer ref={ref => navigatorRef = ref} />
+    return <View style={{flex: 1}}>
+      <Drawer ref={ref => navigatorRef = ref} />
+      <Toast ref={ref => toastRef = ref}
+        style={{backgroundColor: "green"}}
+        textStyle={{color: "white"}}
+        position={"bottom"}
+        positionValue={50} />
+    </View>
   }
 }
 
