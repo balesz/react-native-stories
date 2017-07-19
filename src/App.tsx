@@ -45,8 +45,7 @@ export class StoriesApp extends React.Component<any, State> {
       <Toast ref={ref => toastRef = ref}
         style={{backgroundColor: "green"}}
         textStyle={{color: "white"}}
-        position={"bottom"}
-        positionValue={50} />
+        position={"center"} />
     </View>
   }
 }
