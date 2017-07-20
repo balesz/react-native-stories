@@ -3,6 +3,7 @@ import {
   AsyncStorage,
   LayoutAnimation,
   LayoutAnimationConfig,
+  ScrollViewStyle,
   SectionList,
   SectionListData,
   StyleSheet,
@@ -77,7 +78,7 @@ export class Stories extends React.Component<Props, State> {
     const { selectedKind } = this.state
     return <View style={this.styles.container}>
       <SectionList
-        style={this.styles.list}
+        style={this.styles.list as ScrollViewStyle}
         stickySectionHeadersEnabled={false}
         contentContainerStyle={this.styles.listContainer}
         sections={this.sections}
@@ -96,7 +97,7 @@ export class Stories extends React.Component<Props, State> {
       } as ViewStyle,
       list: {
         flex: 1,
-      } as ViewStyle,
+      } as ScrollViewStyle,
       listContainer: {
       } as ViewStyle,
       listHeader: {
