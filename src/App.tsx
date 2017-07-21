@@ -14,7 +14,7 @@ export function linkTo(kind: string, name: string) {
 }
 
 export function action(name: string) {
-  toastRef.show(name, 2000)
+  toastRef.show(name, 1000)
 }
 
 interface State {
@@ -45,6 +45,8 @@ export class StoriesApp extends React.Component<any, State> {
       <Toast ref={ref => toastRef = ref}
         style={{backgroundColor: "green"}}
         textStyle={{color: "white"}}
+        fadeInDuration={500}
+        fadeOutDuration={500}
         position={"center"} />
     </View>
   }
