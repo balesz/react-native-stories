@@ -51,7 +51,7 @@ export class Stories extends React.Component<Props, State> {
   }
 
   private onClickSection(selectedKind: string) {
-    LayoutAnimation.easeInEaseOut(null as LayoutAnimationConfig)
+    LayoutAnimation.easeInEaseOut()
     this.setState({ selectedKind })
   }
 
