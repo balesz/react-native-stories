@@ -19,13 +19,8 @@
     "types": [],
     "baseUrl": ".",
     "paths": {
-      "*": [
-        "@types/*"
-      ]
+      "*": ["@types/*"]
     }
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx"
-  ]
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
 }
