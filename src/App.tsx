@@ -1,9 +1,13 @@
 import React from "react"
-import { AsyncStorage, View } from "react-native"
-import { StackNavigator, DrawerNavigator } from "react-navigation"
+import {AsyncStorage, View, DrawerPosition} from "react-native"
+import {
+  createStackNavigator,
+  createDrawerNavigator,
+  HeaderMode,
+} from "react-navigation"
 import Toast from "react-native-easy-toast"
-import { StoryBuilder } from "."
-import { Stories } from "./Stories"
+import {StoryBuilder} from "."
+import {Stories} from "./Stories"
 
 let navigatorRef: any
 let toastRef: Toast
@@ -23,32 +27,40 @@ interface State {
 }
 
 export class StoriesApp extends React.Component<any, State> {
-
   async componentWillMount() {
-    const [kind, story] = await AsyncStorage
-      .multiGet(["selectedKind", "selectedStory"])
+    const [kind, story] = await AsyncStorage.multiGet([
+      "selectedKind",
+      "selectedStory",
+    ])
     this.setState({selectedKind: kind[1], selectedStory: story[1]})
   }
 
   render() {
     if (!this.state) return null
-    const { selectedKind, selectedStory } = this.state
+    const {selectedKind, selectedStory} = this.state
     let selected = (selectedKind || "") + (selectedStory || "")
     const routes = routeConfig()
     selected = Object.keys(routes).some(it => it == selected) ? selected : null
-    const stackNavConfig = stackNavigatorConfig(selected)
-    const Stack = StackNavigator(routes, stackNavConfig)
-    const drawerNavConfig = drawerNavigatorConfig(this.state)
-    const Drawer = DrawerNavigator({ Root: { screen: Stack } }, drawerNavConfig)
-    return <View style={{flex: 1}}>
-      <Drawer ref={ref => navigatorRef = ref} />
-      <Toast ref={ref => toastRef = ref}
-        style={{backgroundColor: "green"}}
-        textStyle={{color: "white"}}
-        fadeInDuration={500}
-        fadeOutDuration={500}
-        position={"center"} />
-    </View>
+    const stackNavConfig = stackNavigatorConfig(selected, "none")
+    const Stack = createStackNavigator(routes, stackNavConfig)
+    const drawerNavConfig = drawerNavigatorConfig(this.state, "none")
+    const Drawer = createDrawerNavigator(
+      {Root: {screen: Stack}},
+      drawerNavConfig
+    )
+    return (
+      <View style={{flex: 1}}>
+        <Drawer ref={ref => (navigatorRef = ref)} />
+        <Toast
+          ref={ref => (toastRef = ref)}
+          style={{backgroundColor: "green"}}
+          textStyle={{color: "white"}}
+          fadeInDuration={500}
+          fadeOutDuration={500}
+          position={"center"}
+        />
+      </View>
+    )
   }
 }
 
@@ -57,20 +69,25 @@ function routeConfig() {
     const stories = {}
     val.stories.forEach(it => {
       stories[val.kind + it.name] = {
-        screen: val.decorator ? () => val.decorator(it.story) : it.story
+        screen: val.decorator ? () => val.decorator(it.story) : it.story,
       }
     })
-    return { ...prev, ...stories }
+    return {...prev, ...stories}
   }, {})
 }
 
-function drawerNavigatorConfig(state: State) {
+function drawerNavigatorConfig(state: State, headerMode: HeaderMode) {
   return {
-    backBehavior: "none", drawerPosition: "right",
-    contentComponent: props => <Stories {...props} selected={state} />
+    backBehavior: "none" as "none" | "initialRoute",
+    drawerPosition: "right" as "right" | "left",
+    headerMode,
+    contentComponent: props => <Stories {...props} selected={state} />,
   }
 }
 
-function stackNavigatorConfig(initialRouteName: string) {
-  return { initialRouteName, headerMode: "none", }
+function stackNavigatorConfig(
+  initialRouteName: string,
+  headerMode: HeaderMode
+) {
+  return {initialRouteName, headerMode}
 }

@@ -2,8 +2,6 @@ import React from "react"
 import {
   AsyncStorage,
   LayoutAnimation,
-  LayoutAnimationConfig,
-  ScrollViewStyle,
   SectionList,
   SectionListData,
   StyleSheet,
@@ -14,11 +12,11 @@ import {
   View,
   ViewStyle,
 } from "react-native"
-import { NavigationActions } from "react-navigation"
-import { StoryBuilder } from "."
+import {NavigationActions, StackActions} from "react-navigation"
+import {StoryBuilder} from "."
 
 interface Props {
-  navigation: { dispatch(action: any) }
+  navigation: {dispatch(action: any)}
   selected: State
 }
 
@@ -31,60 +29,78 @@ if (UIManager.setLayoutAnimationEnabledExperimental)
   UIManager.setLayoutAnimationEnabledExperimental(true)
 
 export class Stories extends React.Component<Props, State> {
-
   private sections: Kind[]
 
   constructor(props) {
     super(props)
     this.sections = getSections()
-    this.state = { ...props.selected }
+    this.state = {...props.selected}
   }
 
   private navigate(selectedStory: string) {
     const {selectedKind} = this.state
-    AsyncStorage.multiSet([["selectedKind", selectedKind], ["selectedStory", selectedStory]])
+    AsyncStorage.multiSet([
+      ["selectedKind", selectedKind],
+      ["selectedStory", selectedStory],
+    ])
     const routeName = selectedKind + selectedStory
-    this.props.navigation.dispatch(NavigationActions.reset({
-      index: 0, actions: [NavigationActions.navigate({routeName})]
-    }))
+    this.props.navigation.dispatch(
+      StackActions.reset({
+        index: 0,
+        actions: [NavigationActions.navigate({routeName})],
+      })
+    )
     this.setState({selectedKind, selectedStory})
   }
 
   private onClickSection(selectedKind: string) {
     LayoutAnimation.easeInEaseOut()
-    this.setState({ selectedKind })
+    this.setState({selectedKind})
   }
 
   private renderSectionHeader(kind: Kind) {
-    return <TouchableOpacity
-      onPress={() => this.onClickSection(kind.key)}
-      style={this.styles.sectionContainer}>
-      <Text style={this.styles.sectionText}>{kind.key}</Text>
-    </TouchableOpacity>
+    return (
+      <TouchableOpacity
+        onPress={() => this.onClickSection(kind.key)}
+        style={this.styles.sectionContainer}>
+        <Text style={this.styles.sectionText}>{kind.key}</Text>
+      </TouchableOpacity>
+    )
   }
 
   private renderItem(story: Story) {
     if (this.state.selectedKind != story.kind) return null
-    else return <TouchableOpacity
-      style={this.styles.itemContainer}
-      onPress={() => this.navigate(story.name)}>
-      <Text style={this.state.selectedStory == story.name ? this.styles.itemTextBold : this.styles.itemText}>
-        {story.name}
-      </Text>
-    </TouchableOpacity>
+    else
+      return (
+        <TouchableOpacity
+          style={this.styles.itemContainer}
+          onPress={() => this.navigate(story.name)}>
+          <Text
+            style={
+              this.state.selectedStory == story.name
+                ? this.styles.itemTextBold
+                : this.styles.itemText
+            }>
+            {story.name}
+          </Text>
+        </TouchableOpacity>
+      )
   }
 
   render() {
-    const { selectedKind } = this.state
-    return <View style={this.styles.container}>
-      <SectionList
-        style={this.styles.list as ScrollViewStyle}
-        stickySectionHeadersEnabled={false}
-        contentContainerStyle={this.styles.listContainer}
-        sections={this.sections}
-        renderItem={({ item }) => this.renderItem(item)}
-        renderSectionHeader={({ section }) => this.renderSectionHeader(section)} />
-    </View>
+    const {selectedKind} = this.state
+    return (
+      <View style={this.styles.container}>
+        <SectionList
+          style={this.styles.list}
+          stickySectionHeadersEnabled={false}
+          contentContainerStyle={this.styles.listContainer}
+          sections={this.sections}
+          renderItem={({item}) => this.renderItem(item)}
+          renderSectionHeader={({section}) => this.renderSectionHeader(section)}
+        />
+      </View>
+    )
   }
 
   private get styles() {
@@ -97,9 +113,8 @@ export class Stories extends React.Component<Props, State> {
       } as ViewStyle,
       list: {
         flex: 1,
-      } as ScrollViewStyle,
-      listContainer: {
       } as ViewStyle,
+      listContainer: {} as ViewStyle,
       listHeader: {
         height: 50,
         justifyContent: "center",
@@ -131,7 +146,7 @@ export class Stories extends React.Component<Props, State> {
       itemTextBold: {
         fontSize: 16,
         fontWeight: "bold",
-      } as TextStyle
+      } as TextStyle,
     })
   }
 }
@@ -154,7 +169,7 @@ function getSections(): Kind[] {
     }))
     const section = result.find(el => el.key == it.kind)
     if (section) section.data.push(...items)
-    else result.push({ key: it.kind, data: items })
+    else result.push({key: it.kind, data: items})
   })
   return result
 }
