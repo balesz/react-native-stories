@@ -14,11 +14,12 @@
     "react": "*",
     "react-native": "*",
     "react-native-easy-toast": "^1.1.0",
-    "react-navigation": "^2.18.0"
+    "react-navigation": "^3.0.0"
   },
   "devDependencies": {
     "@types/react": "*",
     "@types/react-native": "*",
+    "@types/react-navigation": "*",
     "typescript": "*"
   }
 }

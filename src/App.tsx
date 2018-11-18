@@ -1,11 +1,12 @@
 import React from "react"
-import {AsyncStorage, View, DrawerPosition} from "react-native"
+import {AsyncStorage, View} from "react-native"
+import Toast from "react-native-easy-toast"
 import {
-  createStackNavigator,
+  createAppContainer,
   createDrawerNavigator,
+  createStackNavigator,
   HeaderMode,
 } from "react-navigation"
-import Toast from "react-native-easy-toast"
 import {StoryBuilder} from "."
 import {Stories} from "./Stories"
 
@@ -48,9 +49,10 @@ export class StoriesApp extends React.Component<any, State> {
       {Root: {screen: Stack}},
       drawerNavConfig
     )
+    const AppContainer = createAppContainer(Drawer)
     return (
       <View style={{flex: 1}}>
-        <Drawer ref={ref => (navigatorRef = ref)} />
+        <AppContainer ref={ref => (navigatorRef = ref)} />
         <Toast
           ref={ref => (toastRef = ref)}
           style={{backgroundColor: "green"}}
